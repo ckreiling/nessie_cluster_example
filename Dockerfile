@@ -19,5 +19,5 @@ COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 
 WORKDIR /app
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
-CMD []
+CMD ["/app/entrypoint.sh", "run"]
 

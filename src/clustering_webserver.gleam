@@ -31,11 +31,7 @@ pub fn main() {
     |> mist.new()
     |> mist.port(8080)
     |> mist.start_http()
-    |> result.map_error(fn(e) {
-      e
-      |> dynamic.from()
-      |> actor.InitCrashed()
-    })
+    |> result.map_error(fn(e) { actor.InitCrashed(dynamic.from(e)) })
   }
 
   let children = fn(children) {

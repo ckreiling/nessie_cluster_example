@@ -1,6 +1,6 @@
-# clustering_webserver
+# nessie_cluster_example
 
-An example using `nessie_cluster` on Fly.io to cluster nodes.
+An example using [nessie_cluster](https://github.com/ckreiling/nessie_cluster) on Fly.io to cluster nodes.
 
 ```sh
 fly launch
