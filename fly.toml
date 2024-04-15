@@ -1,9 +1,4 @@
-# fly.toml app configuration file generated for clustering-webserver on 2024-04-15T08:58:12-04:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
-app = 'clustering-webserver'
+app = 'nessie-cluster-example'
 primary_region = 'ewr'
 
 [build]
