@@ -1,0 +1,23 @@
+# fly.toml app configuration file generated for clustering-webserver on 2024-04-15T08:58:12-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'clustering-webserver'
+primary_region = 'ewr'
+
+[build]
+
+[env]
+  ERL_AFLAGS = '-proto_dist inet6_tcp -name ${FLY_APP_NAME}-${FLY_IMAGE_REF##*-}@${FLY_PRIVATE_IP} -setcookie "$ERLANG_COOKIE"'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  size = 'shared-cpu-1x'
