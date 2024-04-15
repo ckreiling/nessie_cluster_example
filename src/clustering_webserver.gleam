@@ -15,32 +15,31 @@ import mist
 import nessie_cluster
 
 pub fn main() {
-  let cluster_worker = fn(_) {
-    let dns_query = case os.get_env("FLY_APP_NAME") {
-      Ok(app_name) -> nessie_cluster.DnsQuery(app_name <> ".internal")
-      Error(Nil) -> nessie_cluster.Ignore
-    }
-
-    nessie_cluster.new()
-    |> nessie_cluster.with_query(dns_query)
-    |> nessie_cluster.start_spec(option.None)
+  // Initialize DNS clustering
+  let dns_query = case os.get_env("FLY_APP_NAME") {
+    Ok(app_name) -> nessie_cluster.DnsQuery(app_name <> ".internal")
+    Error(Nil) -> nessie_cluster.Ignore
   }
+  let cluster = nessie_cluster.with_query(nessie_cluster.new(), dns_query)
+  let cluster_worker = fn(_) { nessie_cluster.start_spec(cluster, option.None) }
 
-  let web_worker = fn(_) {
+  // Initialize web server
+  let web =
     web_service
     |> mist.new()
     |> mist.port(8080)
+  let web_worker = fn(_) {
+    web
     |> mist.start_http()
     |> result.map_error(fn(e) { actor.InitCrashed(dynamic.from(e)) })
   }
 
-  let children = fn(children) {
-    children
-    |> supervisor.add(supervisor.worker(cluster_worker))
-    |> supervisor.add(supervisor.worker(web_worker))
-  }
-
-  let assert Ok(_) = supervisor.start(children)
+  let assert Ok(_) =
+    supervisor.start(fn(children) {
+      children
+      |> supervisor.add(supervisor.worker(cluster_worker))
+      |> supervisor.add(supervisor.worker(web_worker))
+    })
 
   process.sleep_forever()
 }
